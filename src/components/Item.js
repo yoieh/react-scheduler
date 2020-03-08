@@ -8,7 +8,7 @@ const style = {
 
 export const Item = ({ itemId, name, type, lastTargetId, hideSourceOnDrag, left }) => {
     const [{ isDragging }, drag] = useDrag({
-        item: { id: itemId, name, type, lastTargetId, left },
+        item: { id: itemId,name, type, lastTargetId, left },
         collect: monitor => ({
             isDragging: monitor.isDragging(),
         })

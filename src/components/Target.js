@@ -1,47 +1,38 @@
-import React from 'react';
+import React, { useRef /*, useEffect*/ } from 'react';
 import { useDrop } from 'react-dnd';
 import { Item } from './Item';
 
-export const Target = ({ targeId, name, accept, items, onDrop }) => {
-    const [collectedProps, drop] = useDrop({
+import { FlexRow, TargetLabel } from './StyledComponents';
+
+
+
+export const TargetRow = ({ targeId, name, accept, items, onDrop, hideSourceOnDrag, labelWidth = 110 }) => {
+    const ref = useRef(null);
+    const [props, drop] = useDrop({
         accept,
         drop: onDrop,
         collect: monitor => ({
             isOver: monitor.isOver(),
             canDrop: monitor.canDrop(),
-        }),
-    });
-
-    return <div style={{
-        border: "solid 1px black",
-        flex: 1,
-        flexDirection: "column"
-    }} ref={drop}>{items.map(({ id: itemId, name, type }) => <Item key={itemId} itemId={itemId} name={name} type={type} lastTargetId={targeId} {...collectedProps} />)}</div>;
-};
-
-export const TargetRow = ({ targeId, name, accept, items, onDrop, hideSourceOnDrag }) => {
-    const [, drop] = useDrop({
-        accept,
-        drop: onDrop,
-        collect: monitor => ({
-            isOver: () => monitor.isOver(),
-            canDrop: monitor.canDrop(),
         })
     });
 
-    return <div style={{ flex: '1', display: 'flex', flexDirection: 'row' }}>
-        <span style={{ width: '110px' }}>{name}</span>
-        <div ref={drop} style={{ flex: '1', display: 'flex', flexDirection: 'row' }}>
-            {items.map(({ id: itemId, name, type, left }) =>
-                <Item key={itemId} itemId={itemId} name={name} type={type} lastTargetId={targeId} left={left} hideSourceOnDrag={hideSourceOnDrag} />)}
-        </div>
+    // useEffect(() => {
+    //     const width = ref.current ? ref.current.offsetWidth : 0;
+    //     console.log('width', width);
+    // }, [ref.current]);
 
-    </div>
-
-    // return <div style={{
-    //     border: "solid 1px black",
-    //     flex: 1,
-    //     flexDirection: "column"
-    // }} ref={drop}>{items.map(({ id: itemId, name, type }) => <Item key={itemId} itemId={itemId} name={name} type={type} lastTargetId={targeId} {...collectedProps} />)}</div>;
+    return (
+        <FlexRow>
+            <TargetLabel border={true} labelWidth={labelWidth}>{name}</TargetLabel>
+            <FlexRow ref={ref}  border={true}>
+                <FlexRow ref={drop}>
+                    {items.map(({ id: itemId, name, type, left }) =>
+                        <Item key={itemId} itemId={itemId} name={name} type={type} lastTargetId={targeId} left={left} hideSourceOnDrag={hideSourceOnDrag} />
+                    )}
+                </FlexRow>
+            </FlexRow>
+        </FlexRow >
+    )
 };
 

@@ -7,14 +7,15 @@ import svLocal from 'date-fns/locale/sv';
 import { TargetRow } from '../components/Target';
 import ItemTypes from '../ItemTypes';
 import update from "immutability-helper";
+import { FlexColumn, FlexRow, TargetLabel } from '../components/StyledComponents';
 
 const resources = [
     {
         id: 1, name: "Res1", accepts: ItemTypes.ITEM, items: [
-            { id: 1, name: "item A", type: ItemTypes.ITEM, left: 80 },
-            { id: 2, name: "item B", type: ItemTypes.ITEM, left: 80 },
-            { id: 3, name: "item C", type: ItemTypes.ITEM, left: 80 },
-            { id: 4, name: "item D", type: ItemTypes.ITEM, left: 80 }
+            { id: 1, name: "item A", type: ItemTypes.ITEM, left: 0 },
+            { id: 2, name: "item B", type: ItemTypes.ITEM, left: 1810 },
+            { id: 3, name: "item C", type: ItemTypes.ITEM, left: 0 },
+            { id: 4, name: "item D", type: ItemTypes.ITEM, left: 0 }
         ]
     },
     { id: 2, name: "Res2", accepts: ItemTypes.ITEM, items: [] },
@@ -23,7 +24,7 @@ const resources = [
     { id: 5, name: "Res5", accepts: ItemTypes.ITEM, items: [] }
 ];
 
-export const Grid = () => {
+export const Grid = ({ labelWidth = 110 }) => {
     const [hideSourceOnDrag, setHideSourceOnDrag] = useState(true)
     const toggle = useCallback(() => setHideSourceOnDrag(!hideSourceOnDrag), [
         hideSourceOnDrag,
@@ -34,7 +35,7 @@ export const Grid = () => {
         end: endOfWeek(new Date(), { weekStartsOn: 1 })
     }).map(date => format(date, 'P', { locale: svLocal }))
 
-    const data = resources.map(r => (
+    const data = resources.map(r => ({ ...r, items: r.items.map(i => ({ ...i, left: labelWidth + i.left })) })).map(r => (
         { ...r, dates: dates }
     ));
 
@@ -76,20 +77,18 @@ export const Grid = () => {
     );
 
     return (
-        <div>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
-                <div style={{ flex: '1', display: 'flex', flexDirection: 'row' }}>
-                    <span style={{ width: '110px' }}>Resources</span>
-                    <div style={{ flex: '1', display: 'flex', flexDirection: 'row', justifyContent: "space-between" }}>
-                        {dates.map(date => <span key={date} style={{ flex: '1' }}>{date}</span>)}
-                    </div>
-                </div>
+        <FlexColumn border={true}>
+            <FlexRow>
+                <TargetLabel border={true} labelWidth={labelWidth}>Resources</TargetLabel>
+                <FlexRow border={true}>
+                    {dates.map(date => <span key={date} style={{ flex: '1' }}>{date}</span>)}
+                </FlexRow>
+            </FlexRow>
 
-                {targets.map(({ id, name, accepts, items }, index) => (
-                    <TargetRow key={id} targeId={id} name={name} accept={accepts} items={items} onDrop={(item, monitor) => handleDrop(index, item, monitor)} hideSourceOnDrag={hideSourceOnDrag} />
-                ))}
-            </div>
-        </div>
+            {targets.map(({ id, name, accepts, items }, index) => (
+                <TargetRow key={id} targeId={id} name={name} accept={accepts} items={items} onDrop={(item, monitor) => handleDrop(index, item, monitor)} hideSourceOnDrag={hideSourceOnDrag} />
+            ))}
+        </FlexColumn>
     )
 }
 
